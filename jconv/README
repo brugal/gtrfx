@@ -1,0 +1,134 @@
+Jconv-0.8.0    10/3/2009
+========================
+
+
+New in this release
+-------------------
+
+- New option -L <nsamples>. Try to compensate for
+'nsamples' of processing latency by moving impulse
+responses to earlier times. This works by first
+decreasing the 'delay' parameter, and if this is
+not sufficient by increasing the 'offset' value.
+A warning is printed in the latter case.
+
+- New /input/name and /output/name commands to
+provide meaningfull port names and optionally
+connect them.
+
+- New ambisonic and stereo IRs for the concert
+hall at La Casa della Musica, and for the former
+Santa Elisabetta church (now La casa del Suono)
+in Parma.
+
+
+
+Jconv-0.2.0
+===========
+
+
+New in this release
+-------------------
+
+- The convolution engine has been separated into
+  a shared library, libzita-convolver. For more
+  information on the internals of the convolution
+  engine, see the documentation provided with this
+  library.
+
+- A non-real-time, file processing version of jconv,
+  called fconv, has been added. It accepts the same
+  configuration files. The input can be any file 
+  readable by libsndfile. The output will be a 24-
+  bit WAV or WAVEX (for more than 2 channels).
+
+- Large configurations requiring too much memory
+  will fail with an error message rather than just
+  crash with a segfault.
+
+- Now uses jack_client_open(), so multiple instances
+  can be run even without using the -N <jack_name>
+  option.
+
+- Optional use of FFTW_MEASURE.
+
+- Added the mkwavex utility, converts multichannel
+  responses stored in separate files to a single
+  WAVEX file.
+
+- New config files for some AMB reverbs.
+
+
+Description
+-----------
+
+Jconv is a Convolution Engine for JACK using FFT-based
+partitioned convolution with multiple partition sizes.
+It's a command line version of what will be the core of
+the Aella reverb processor, but without the special reverb
+feautures, preset management, reverb envelope editing etc.
+that Aella will have.
+
+Jconv uses a configurable smallest partition size at the
+start of the impulse response, and longer ones further on.
+This way you can have long impulse responses *and* minimal
+or even zero delay at a reasonable CPU load. This would be
+impossible using just one partition size. The selection of
+the number of partitions of each size is fully automatic.
+
+Processing for partition sizes larger than Jack's period
+size is delegated to up to five threads running at real-time
+priorities just below that of Jack's audio threads. CPU load
+generated in such threads will *not* show up in Jack's DSP
+load figures as shown by e.g. Ardour and qjackctl.
+
+If you set the smallest partition size equal to JACK's period,
+there will be zero processing delay. Otherwise the processing
+delay is 2 * smallest_partition - period_size.
+
+Jconv will do any convolution matrix up to 64 inputs by 64
+outputs, as long as your CPU can handle it. It doesn't waste
+any CPU cycles on empty cells in the matrix, so a series of
+independent convolutions or any other sparse matrix will be
+executed as efficiently as a fully populated one. The maximum
+length for each convolution is 2^20 samples. 
+
+Jconv can easily generate 100% CPU load at real-time priority.
+This will in most cases not stop audio processing, as the load
+will be at lower priority, but it will lock up everything else
+running at normal priorities such as your terminals or desktop.
+If this happens, don't panic -- jconv will detect the situation
+and bail out after a short time, printing 'CPU OVERLOAD'.
+
+
+Command line parameters
+-----------------------
+
+Run jconv without any parameter or jconv -h to see the options.
+
+
+Configuration file format
+-------------------------
+
+See the file README.CONFIG and the example configuration files.
+
+
+Known problems
+--------------
+
+When using many long convolutions giving a CPU load close to
+100%, mouse movements, terminal echo and scrolling etc. may
+become less smooth. This is because the thread handling the
+largest partition size (8192 frames) will run at a frequency
+of only about 6 Hz (for sample rates of 44.1 or 48 kHz), and
+take almost all CPU. This issue will be addressed in future
+releases of libzita-convolver.
+
+
+
+Enjoy !
+
+-- 
+FA
+
+

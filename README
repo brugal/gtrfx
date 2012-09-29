@@ -1,0 +1,6 @@
+gtrfx:
+
+Guitar effects program with plug-in in support allowing you to play guitar through your computer.  Includes custom plug-ins for distortion, gain, recording, piped audio input, pitch tuner, etc.  Supports alsa, jack, lasdpa audio plug-ins, and jconv convolution engine for guitar cabinet simulation.
+
+Angelo Cano
+Copyright 2012

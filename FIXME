@@ -1,0 +1,2 @@
+* gtk sliders are grabing mouse scroll events,
+* on close event need to signal ogg encoder that we are done

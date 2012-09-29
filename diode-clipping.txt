@@ -1,0 +1,44 @@
+Re: [linux-audio-dev] Diode wave shaper (LADSPA plugin)?
+Previous message: [thread] [date] [author]
+Next message: [thread] [date] [author]
+From: Alfons Adriaensen <fons.adriaensen@...>
+To: The Linux Audio Developers' Mailing List <linux-audio-dev@...>
+Subject: Re: [linux-audio-dev] Diode wave shaper (LADSPA plugin)?
+Date: Monday, August 16, 2004 - 10:29 am
+
+On Mon, Aug 16, 2004 at 07:49:36PM +1000, Erik de Castro Lopo wrote:
+
+> Its actually rather simple (first year EE):
+quoted text
+>
+> static inline double
+> diode_clip (double input, double clip_level /* should be positive */)
+> { if (input > clip_level)
+> return clip_level ;
+> if (input < -clip_level)
+> return clip_level ;
+> return input ;
+> }
+
+This is a bit too simple. The diode circuit does not perform hard
+clipping when driven at moderate levels.
+
+Something like
+
+out = tanh (in) (or tanhf() if available)
+
+or
+
+out = in / sqrt (1 + in * in)
+
+with some scaling of in and out will come very close
+to the real behaviour. Alternatively change the '1' in
+the sqrt to some other constant to set the normal
+operation levels.
+
+--
+FA
+
+Previous message: [thread] [date] [author]
+Next message: [thread] [date] [author]
+Messages in current thread:
